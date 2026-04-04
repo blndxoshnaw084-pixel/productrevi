@@ -1,14 +1,13 @@
-# 1. Build the web project
 flutter build web --base-href "/productrevi/"
 
-# 2. Refresh the docs folder
-if (Test-Path docs) { rd /s /q docs }
+if (Test-Path docs) { 
+    Remove-Item -Recurse -Force docs 
+}
 mkdir docs
-xcopy /E /I /Y build\web docs
+xcopy /E /I /Y build\web docs > $null
 
-# 3. Push to GitHub
 git add .
 git commit -m "Auto update: $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-git push origin main
+git push origin main --force
 
-Write-Host "✅ هەمەوو شتێک بە سەرکەوتوویی نوێ بووەوە!" -ForegroundColor Green
+Write-Host "✅ Done!" -ForegroundColor Green
