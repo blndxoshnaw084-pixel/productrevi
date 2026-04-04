@@ -16,73 +16,90 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cosmetic Review App',
+      title: 'Cosmetic Store',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        // Dark Blue Theme
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: const Color(0xFFF0F2F5),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const CosmeticHome(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class CosmeticHome extends StatefulWidget {
+  const CosmeticHome({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CosmeticHome> createState() => _CosmeticHomeState();
 }
 
-class _HomePageState extends State<HomePage> {
-  // Simple list of products
-  final List<Map<String, dynamic>> products = [
-    {'name': 'Face Cream', 'brand': 'SoftSkin', 'rating': 4.5},
-    {'name': 'Matte Lipstick', 'brand': 'RedVibe', 'rating': 4.0},
-    {'name': 'Sunblock SPF50', 'brand': 'SunGuard', 'rating': 4.8},
-    {'name': 'Shampoo', 'brand': 'HairCare', 'rating': 4.2},
-    {'name': 'Mascara', 'brand': 'LongLash', 'rating': 4.7},
-    {'name': 'Body Lotion', 'brand': 'DailyMoist', 'rating': 4.3},
-    {'name': 'Perfume', 'brand': 'BlueNight', 'rating': 4.9},
+class _CosmeticHomeState extends State<CosmeticHome> {
+  // Simple list of 7 cosmetic products
+  final List<Map<String, dynamic>> items = [
+    {'name': 'Night Repair Cream', 'brand': 'Loreal', 'stars': 5},
+    {'name': 'Matte Lipstick', 'brand': 'MAC', 'stars': 4},
+    {'name': 'Sunscreen SPF 50', 'brand': 'Vichy', 'stars': 5},
+    {'name': 'Face Wash', 'brand': 'CleanClear', 'stars': 3},
+    {'name': 'Hair Serum', 'brand': 'Ordinary', 'stars': 4},
+    {'name': 'Body Mist', 'brand': 'Victoria', 'stars': 5},
+    {'name': 'Foundation', 'brand': 'FitMe', 'stars': 4},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cosmetic Reviews'),
-        backgroundColor: Colors.pink[100],
+        title: const Text('Cosmetic Product Reviews', style: TextStyle(fontSize: 22)),
+        backgroundColor: const Color(0xFF1A237E), // Dark Blue
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: products.length,
+              itemCount: items.length,
               itemBuilder: (context, index) {
                 return Card(
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                   child: ListTile(
-                    leading: const Icon(Icons.auto_awesome, color: Colors.pink),
-                    title: Text(products[index]['name']),
-                    subtitle: Text('Brand: ${products[index]['brand']}'),
-                    trailing: Text('⭐ ${products[index]['rating']}'),
-                    onTap: () {
-                      _showReviewDialog(products[index]['name']);
-                    },
+                    contentPadding: const EdgeInsets.all(10),
+                    leading: const Icon(Icons.shopping_bag, color: Color(0xFF1A237E), size: 30),
+                    title: Text(items[index]['name'], 
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    subtitle: Text('Brand: ${items[index]['brand']}', 
+                        style: const TextStyle(fontSize: 15)),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => _openReview(items[index]['name']),
                   ),
                 );
               },
             ),
           ),
-          // Footer with your name
+          // Footer Section
           Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.grey[200],
-            width: double.infinity,
-            child: const Text(
-              'Created by: Blnd Abdulla',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold),
+            color: const Color(0xFF1A237E),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                const Text(
+                  'Developed by: Blnd Abdulla',
+                  style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.camera_alt, color: Colors.white70, size: 22), // Instagram
+                    SizedBox(width: 20),
+                    Icon(Icons.facebook, color: Colors.white70, size: 22), // Facebook
+                    SizedBox(width: 20),
+                    Icon(Icons.alternate_email, color: Colors.white70, size: 22), // X (Twitter)
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -90,41 +107,43 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Simple dialog to add a review
-  void _showReviewDialog(String productName) {
+  // Simple and clean review dialog
+  void _openReview(String title) {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Review for $productName'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const TextField(
-                decoration: InputDecoration(hintText: 'Write your comment here'),
+      builder: (context) => AlertDialog(
+        title: Text('Rate $title', style: const TextStyle(fontSize: 20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const TextField(
+              decoration: InputDecoration(
+                hintText: 'Enter your feedback...',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 10),
-              const Text('Rate this product (1-5):'),
-              Slider(value: 4, min: 1, max: 5, onChanged: (v) {}),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              maxLines: 2,
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Thank you for your review!')),
-                );
-              },
-              child: const Text('Submit'),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (i) => const Icon(Icons.star, color: Colors.amber)),
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1A237E)),
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Review Submitted!')),
+              );
+            },
+            child: const Text('Save', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }
