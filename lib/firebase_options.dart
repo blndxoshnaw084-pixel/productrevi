@@ -42,12 +42,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyACV-ZUUT1elcWVsKxbr9Lf0lRrcnV54qo',
-    appId: '1:652501621128:web:0d2ad2758776d9181b423d',
+    appId: '1:652501621128:web:6f2a1dd3895e73461b423d',
     messagingSenderId: '652501621128',
     projectId: 'productreivew',
     authDomain: 'productreivew.firebaseapp.com',
     storageBucket: 'productreivew.firebasestorage.app',
-    measurementId: 'G-J3Q8X1MFED',
+    measurementId: 'G-KRF25CTYLN',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'productreivew.firebasestorage.app',
     measurementId: 'G-KRF25CTYLN',
   );
+
 }

@@ -26,25 +26,6 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:652501621128:android:0cb4ac38947b38261b423d",
-        "android_client_info": {
-          "package_name": "com.example.flutter_application_1"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAHdEr7Csy4JiAw5tIq5C-HJTfPDScBqkQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:652501621128:android:ebdf01d391ad67a41b423d",
         "android_client_info": {
           "package_name": "com.example.product_review"
