@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -19,7 +20,6 @@ class MyApp extends StatelessWidget {
       title: 'Cosmetic Store',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // Dark Blue Theme
         primarySwatch: Colors.indigo,
         scaffoldBackgroundColor: const Color(0xFFF0F2F5),
         useMaterial3: true,
@@ -37,7 +37,6 @@ class CosmeticHome extends StatefulWidget {
 }
 
 class _CosmeticHomeState extends State<CosmeticHome> {
-  // Simple list of 7 cosmetic products
   final List<Map<String, dynamic>> items = [
     {'name': 'Night Repair Cream', 'brand': 'Loreal', 'stars': 5},
     {'name': 'Matte Lipstick', 'brand': 'MAC', 'stars': 4},
@@ -53,7 +52,7 @@ class _CosmeticHomeState extends State<CosmeticHome> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cosmetic Product Reviews', style: TextStyle(fontSize: 22)),
-        backgroundColor: const Color(0xFF1A237E), // Dark Blue
+        backgroundColor: const Color(0xFF1A237E),
         foregroundColor: Colors.white,
       ),
       body: Column(
@@ -78,7 +77,6 @@ class _CosmeticHomeState extends State<CosmeticHome> {
               },
             ),
           ),
-          // Footer Section
           Container(
             color: const Color(0xFF1A237E),
             padding: const EdgeInsets.all(20),
@@ -92,11 +90,11 @@ class _CosmeticHomeState extends State<CosmeticHome> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(Icons.camera_alt, color: Colors.white70, size: 22), // Instagram
+                    Icon(Icons.camera_alt, color: Colors.white70, size: 22),
                     SizedBox(width: 20),
-                    Icon(Icons.facebook, color: Colors.white70, size: 22), // Facebook
+                    Icon(Icons.facebook, color: Colors.white70, size: 22),
                     SizedBox(width: 20),
-                    Icon(Icons.alternate_email, color: Colors.white70, size: 22), // X (Twitter)
+                    Icon(Icons.alternate_email, color: Colors.white70, size: 22),
                   ],
                 ),
               ],
@@ -107,8 +105,9 @@ class _CosmeticHomeState extends State<CosmeticHome> {
     );
   }
 
-  // Simple and clean review dialog
   void _openReview(String title) {
+    TextEditingController commentController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -116,8 +115,9 @@ class _CosmeticHomeState extends State<CosmeticHome> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: commentController,
+              decoration: const InputDecoration(
                 hintText: 'Enter your feedback...',
                 border: OutlineInputBorder(),
               ),
@@ -134,10 +134,17 @@ class _CosmeticHomeState extends State<CosmeticHome> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1A237E)),
-            onPressed: () {
+            onPressed: () async {
+              // ناردنی زانیارییەکان بۆ ناو Firestore Database
+              await FirebaseFirestore.instance.collection('reviews').add({
+                'product_name': title,
+                'comment': commentController.text,
+                'time': DateTime.now(),
+              });
+
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Review Submitted!')),
+                const SnackBar(content: Text('Review Saved successfully!')),
               );
             },
             child: const Text('Save', style: TextStyle(color: Colors.white)),
