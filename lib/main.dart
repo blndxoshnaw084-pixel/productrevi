@@ -15,156 +15,177 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cosmetic Store',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.indigo),
+      theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1A237E),
+          foregroundColor: Colors.white,
+        ),
+      ),
       home: const HomePage(),
     );
   }
 }
 
-// 1. Simple HomePage
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  // Simple product list
-  final List<Map<String, String>> products = const [
-    {'name': 'Night Cream', 'brand': 'Loreal', 'img': 'https://picsum.photos/seed/cream/100'},
-    {'name': 'Lipstick', 'brand': 'MAC', 'img': 'https://picsum.photos/seed/lip/100'},
-    {'name': 'Sunscreen', 'brand': 'Vichy', 'img': 'https://picsum.photos/seed/sun/100'},
-    {'name': 'Face Wash', 'brand': 'CleanClear', 'img': 'https://picsum.photos/seed/wash/100'},
-    {'name': 'Hair Serum', 'brand': 'Ordinary', 'img': 'https://picsum.photos/seed/hair/100'},
-    {'name': 'Body Mist', 'brand': 'Victoria', 'img': 'https://picsum.photos/seed/body/100'},
-    {'name': 'Foundation', 'brand': 'FitMe', 'img': 'https://picsum.photos/seed/found/100'},
+  final List<String> products = const [
+    'iPhone 15 Pro Max',
+    'MacBook Pro M3',
+    'Sony Wireless Headphones',
+    'Samsung Galaxy Watch',
+    'Dell 4K Monitor',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cosmetic Reviews', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF1A237E),
+        title: const Text('Product Review App', style: TextStyle(fontSize: 26)), 
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
               itemCount: products.length,
-              itemBuilder: (context, i) {
+              itemBuilder: (context, index) {
                 return Card(
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(12),
                   child: ListTile(
-                    leading: Image.network(products[i]['img']!, width: 50, height: 50),
-                    title: Text(products[i]['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(products[i]['brand']!),
-                    trailing: const Icon(Icons.comment, color: Color(0xFF1A237E)),
-                    onTap: () => showDialog(
-                      context: context,
-                      builder: (_) => ReviewDialog(productName: products[i]['name']!),
-                    ),
+                    contentPadding: const EdgeInsets.all(15),
+                    leading: const Icon(Icons.devices, color: Color(0xFF1A237E), size: 35),
+                    title: Text(products[index], style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)), // فۆنتی ٢٢
+                    trailing: const Icon(Icons.star_rate, color: Colors.amber, size: 30),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReviewPage(productName: products[index]),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
             ),
           ),
-          // Footer
+          // Footer Section with Icons
           Container(
-            padding: const EdgeInsets.all(15),
-            color: const Color(0xFF1A237E),
             width: double.infinity,
-            child: const Text(
-              'Developed by: Blnd Abdulla', 
-              textAlign: TextAlign.center, 
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            color: const Color(0xFF1A237E),
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              children: [
+                const Text(
+                  'Developed by: Blnd Abdulla',
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.camera_alt, color: Colors.white70, size: 28), // Instagram
+                    SizedBox(width: 25),
+                    Icon(Icons.facebook, color: Colors.white70, size: 28), // Facebook
+                    SizedBox(width: 25),
+                    Icon(Icons.phone, color: Colors.white70, size: 28), // Contact
+                  ],
+                ),
+              ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 }
 
-// 2. Simple Dialog for Reviews
-class ReviewDialog extends StatefulWidget {
+class ReviewPage extends StatefulWidget {
   final String productName;
-  const ReviewDialog({super.key, required this.productName});
+  const ReviewPage({super.key, required this.productName});
 
   @override
-  State<ReviewDialog> createState() => _ReviewDialogState();
+  State<ReviewPage> createState() => _ReviewPageState();
 }
 
-class _ReviewDialogState extends State<ReviewDialog> {
-  int stars = 5;
-  TextEditingController comment = TextEditingController();
+class _ReviewPageState extends State<ReviewPage> {
+  final TextEditingController commentController = TextEditingController();
+  int currentRating = 5;
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.productName),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Rating system
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) => IconButton(
-                icon: Icon(index < stars ? Icons.star : Icons.star_border, color: Colors.amber, size: 30),
-                onPressed: () => setState(() => stars = index + 1),
-              )),
-            ),
-            TextField(
-              controller: comment,
-              decoration: const InputDecoration(hintText: 'Write a comment...'),
-            ),
-            const SizedBox(height: 20),
-            
-            // Show old reviews from Firebase
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Past Reviews:', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 5),
-            SizedBox(
-              height: 120, // Fixed height so it doesn't break
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('reviews')
-                    .where('product', isEqualTo: widget.productName).snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData) return const Text('Loading...');
-                  if (snapshot.data!.docs.isEmpty) return const Text('No reviews yet');
-                  
-                  return ListView(
-                    shrinkWrap: true,
-                    children: snapshot.data!.docs.map((doc) {
-                      return Text('⭐ ${doc['stars']} - ${doc['comment']}');
-                    }).toList(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.productName, style: const TextStyle(fontSize: 24)),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(25.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('1. Select Rating:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(
+                      index < currentRating ? Icons.star : Icons.star_border,
+                      color: Colors.amber,
+                      size: 45, // سایزی گەورەی ستێرەکان
+                    ),
+                    onPressed: () => setState(() => currentRating = index + 1),
                   );
-                },
+                }),
               ),
-            )
-          ],
+              const SizedBox(height: 30),
+              const Text('2. Write Review:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 15),
+              TextField(
+                controller: commentController,
+                style: const TextStyle(fontSize: 20),
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'Enter your feedback here...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 40),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1A237E),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  ),
+                  onPressed: () async {
+                    if (commentController.text.isNotEmpty) {
+                      // Save data to Firebase
+                      await FirebaseFirestore.instance.collection('reviews').add({
+                        'product': widget.productName,
+                        'comment': commentController.text,
+                        'rating': currentRating,
+                        'timestamp': FieldValue.serverTimestamp(),
+                      });
+                      
+                      // Show success message and go back
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Thank you for your review!', style: TextStyle(fontSize: 18))),
+                        );
+                        Navigator.pop(context); // Automatically returns to Home
+                      }
+                    }
+                  },
+                  child: const Text('Submit Review', style: TextStyle(fontSize: 20)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context), 
-          child: const Text('Close')
-        ),
-        ElevatedButton(
-          onPressed: () {
-            // Save to Firebase
-            FirebaseFirestore.instance.collection('reviews').add({
-              'product': widget.productName,
-              'stars': stars,
-              'comment': comment.text,
-            });
-            Navigator.pop(context);
-          }, 
-          child: const Text('Save')
-        )
-      ],
     );
   }
 }
